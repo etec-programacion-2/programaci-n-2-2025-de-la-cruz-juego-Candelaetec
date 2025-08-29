@@ -1,30 +1,105 @@
 package org.example
+
 fun main() {
-    // Crear jugadores
+    println("=== JUEGO COMPLETO CON TABLERO ===\n")
+    
+    // 1. Crear jugadores
     val jugador1 = Jugador(id = 1L, nombre = "Ana")
-    val jugador2 = Jugador(id = 2L, nombre = "Carlos", puntuacion = 50)
+    val jugador2 = Jugador(id = 2L, nombre = "Carlos")
     
-    println("Jugador creado: $jugador1")
-    println("Jugador con puntuación: $jugador2")
+    println("Jugadores creados:")
+    println("- ${jugador1.nombre} (ID: ${jugador1.id})")
+    println("- ${jugador2.nombre} (ID: ${jugador2.id})\n")
     
-    // Crear un juego
-    var juego = Juego(id = "PARTIDA-001")
-    println("Juego creado: Estado inicial = ${juego.estado}")
+    // 2. Crear un juego con tablero 3x3 (como tres en línea)
+    var juego = Juego(
+        id = "PARTIDA-001",
+        filasTablero = 3,
+        columnasTablero = 3,
+        maxJugadores = 2
+    )
     
-    // Agregar jugadores
+    println("Juego creado: ${juego.id}")
+    println("Estado inicial: ${juego.estado}")
+    println("Tablero inicial:")
+    println(juego.verTablero())
+    
+    // 3. Agregar jugadores al juego
     juego = juego.agregarJugador(jugador1)
     juego = juego.agregarJugador(jugador2)
-    println("Jugadores en la partida: ${juego.jugadores.size}")
     
-    // Iniciar el juego
+    println("Jugadores agregados: ${juego.jugadores.size}")
+    
+    // 4. Iniciar el juego
     juego = juego.iniciarJuego()
-    println("Estado del juego después de iniciar: ${juego.estado}")
+    println("¡Juego iniciado! Estado: ${juego.estado}\n")
     
-    // Actualizar puntuación de un jugador
-    val jugadorActualizado = jugador1.actualizarPuntuacion(100)
-    println("Jugador con nueva puntuación: $jugadorActualizado")
+    // 5. Simular algunos movimientos en el tablero
+    println("=== SIMULACIÓN DE MOVIMIENTOS ===")
     
-    // Ejemplo de las propiedades computadas
-    println("¿Está lleno el juego? ${juego.estaLleno}")
-    println("Jugadores conectados: ${juego.jugadoresConectados.size}")
+    // Turno del jugador Ana (X)
+    println("Turno de Ana - coloca X en (0,0):")
+    juego = juego.realizarMovimiento(1L, 0, 0, "X")
+    println(juego.verTablero())
+    
+    // Turno del jugador Carlos (O)
+    println("Turno de Carlos - coloca O en (1,1):")
+    juego = juego.realizarMovimiento(2L, 1, 1, "O")
+    println(juego.verTablero())
+    
+    // Más movimientos
+    println("Ana coloca X en (0,1):")
+    juego = juego.realizarMovimiento(1L, 0, 1, "X")
+    println(juego.verTablero())
+    
+    println("Carlos coloca O en (2,0):")
+    juego = juego.realizarMovimiento(2L, 2, 0, "O")
+    println(juego.verTablero())
+    
+    // 6. Verificar estado del tablero
+    println("=== ANÁLISIS DEL TABLERO ===")
+    println("Posiciones disponibles: ${juego.posicionesDisponibles()}")
+    println("¿Posición (0,2) disponible? ${juego.posicionDisponible(0, 2)}")
+    println("¿Posición (0,0) disponible? ${juego.posicionDisponible(0, 0)}")
+    
+    // 7. Demostrar manejo de errores
+    println("\n=== MANEJO DE ERRORES ===")
+    try {
+        juego.realizarMovimiento(1L, 0, 0, "X") // Intentar ocupar celda ya ocupada
+    } catch (e: Exception) {
+        println("Error capturado: ${e.message}")
+    }
+    
+    try {
+        juego.realizarMovimiento(1L, 5, 5, "X") // Coordenadas fuera del tablero
+    } catch (e: Exception) {
+        println("Error capturado: ${e.message}")
+    }
+    
+    // 8. Ejemplo con tablero más grande (ajedrez)
+    println("\n=== JUEGO DE AJEDREZ (8x8) ===")
+    var juegoAjedrez = Juego(
+        id = "AJEDREZ-001",
+        filasTablero = 8,
+        columnasTablero = 8,
+        maxJugadores = 2
+    )
+    
+    juegoAjedrez = juegoAjedrez.agregarJugador(
+        Jugador(id = 3L, nombre = "María")
+    )
+    juegoAjedrez = juegoAjedrez.agregarJugador(
+        Jugador(id = 4L, nombre = "Luis")
+    )
+    juegoAjedrez = juegoAjedrez.iniciarJuego()
+    
+    // Colocar algunas piezas de ajedrez
+    juegoAjedrez = juegoAjedrez.realizarMovimiento(3L, 0, 0, "♜")
+    juegoAjedrez = juegoAjedrez.realizarMovimiento(4L, 7, 7, "♖")
+    juegoAjedrez = juegoAjedrez.realizarMovimiento(3L, 0, 4, "♚")
+    
+    println("Tablero de ajedrez:")
+    println(juegoAjedrez.verTablero())
+    
+    println("Estado del juego de ajedrez: $juegoAjedrez")
 }
