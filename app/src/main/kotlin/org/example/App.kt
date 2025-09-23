@@ -93,10 +93,14 @@ fun main() {
     )
     juegoAjedrez = juegoAjedrez.iniciarJuego()
     
-    // Colocar algunas piezas de ajedrez
-    juegoAjedrez = juegoAjedrez.realizarMovimiento(3L, 0, 0, "♜")
-    juegoAjedrez = juegoAjedrez.realizarMovimiento(4L, 7, 7, "♖")
-    juegoAjedrez = juegoAjedrez.realizarMovimiento(3L, 0, 4, "♚")
+    // Crear tablero con algunas piezas de ajedrez preconfiguradas
+    val tableroAjedrez = Tablero(8, 8)
+    tableroAjedrez.colocarEnCelda(0, 0, "♜")
+    tableroAjedrez.colocarEnCelda(7, 7, "♖")
+    tableroAjedrez.colocarEnCelda(0, 4, "♚")
+    
+    // Actualizar el juego con el tablero configurado
+    juegoAjedrez = juegoAjedrez.copy(tablero = tableroAjedrez)
     
     println("Tablero de ajedrez:")
     println(juegoAjedrez.verTablero())
