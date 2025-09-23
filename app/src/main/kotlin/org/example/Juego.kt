@@ -5,7 +5,7 @@ package org.example
  * 
  * @param id Identificador único de la partida
  * @param tablero El tablero donde se desarrolla el juego
- * @param jugadores Lista mutable de jugadores participando en la partida
+ * @param jugadores Lista de jugadores participando en la partida
  * @param estado Estado actual de la partida
  * @param jugadorActual Índice del jugador cuyo turno es actual
  * @param fechaCreacion Timestamp de cuándo se creó la partida
@@ -16,7 +16,7 @@ package org.example
 data class Juego(
     val id: String,
     val tablero: Tablero,
-    val jugadores: MutableList<Jugador> = mutableListOf(),
+    val jugadores: List<Jugador> = listOf(),
     val estado: EstadoJuego = EstadoJuego.ESPERANDO_JUGADORES,
     val jugadorActual: Int = 0, // Índice del jugador actual
     val fechaCreacion: Long = System.currentTimeMillis(),
@@ -67,45 +67,19 @@ data class Juego(
         } else null
     
     // ==========================================
-    // MÉTODOS MEJORADOS PARA GESTIÓN DE MOVIMIENTOS
+    // MÉTODOS PRINCIPALES (delegan en MotorJuego)
     // ==========================================
     
     /**
-     * Realiza un movimiento complejo en el tablero (con origen y destino)
-     * 
-     * @param jugador El jugador que realiza el movimiento
-     * @param movimiento El movimiento a realizar
-     * @return Nueva instancia del juego con el movimiento aplicado
-     * @throws IllegalStateException Si el juego no está en curso
-     * @throws IllegalArgumentException Si el movimiento no es válido
+     * Realiza un movimiento utilizando el MotorJuego
      */
     fun realizarMovimiento(jugador: Jugador, movimiento: Movimiento): Juego {
-        // Validaciones básicas
-        require(estado == EstadoJuego.EN_CURSO) { 
-            "El juego debe estar en curso para realizar movimientos. Estado actual: $estado" 
-        }
-        
-        require(jugadores.any { it.id == jugador.id }) { 
-            "El jugador '${jugador.nombre}' (ID: ${jugador.id}) no está en esta partida" 
-        }
-        
-        require(esturnoDelJugador(jugador)) { 
-            "No es el turno del jugador '${jugador.nombre}'. Turno actual: ${jugadorEnTurno?.nombre}" 
-        }
-        
-        // Validar el movimiento según las reglas del juego
-        validarMovimiento(jugador, movimiento)
-        
-        // Ejecutar el movimiento
-        ejecutarMovimiento(movimiento)
-        
-        // Retornar nueva instancia con el turno avanzado
-        return this.copy(jugadorActual = calcularSiguienteJugador())
+        val motor = MotorJuego(this)
+        return motor.procesarMovimiento(jugador, movimiento)
     }
-    
+
     /**
-     * Método sobrecargado para mantener compatibilidad con la implementación anterior
-     * (para colocaciones simples como tres en línea)
+     * Método sobrecargado para compatibilidad (colocaciones simples como tres en línea)
      */
     fun realizarMovimiento(jugadorId: Long, fila: Int, columna: Int, contenido: String): Juego {
         val jugador = jugadores.find { it.id == jugadorId }
@@ -114,23 +88,42 @@ data class Juego(
         val movimiento = Movimiento.colocacion(fila, columna, contenido)
         return realizarMovimiento(jugador, movimiento)
     }
-    
+
     /**
-     * Valida si un movimiento es legal según las reglas del juego
+     * Método interno para que el MotorJuego ejecute el movimiento
+     * sin encargarse de turnos ni validación de victoria.
      */
+    internal fun ejecutarMovimientoInterno(jugador: Jugador, movimiento: Movimiento): Juego {
+        require(estado == EstadoJuego.EN_CURSO) {
+            "El juego debe estar en curso para realizar movimientos. Estado actual: $estado"
+        }
+        require(jugadores.any { it.id == jugador.id }) {
+            "El jugador '${jugador.nombre}' (ID: ${jugador.id}) no está en esta partida"
+        }
+
+        // Validar movimiento según reglas
+        validarMovimiento(jugador, movimiento)
+
+        // Ejecutar movimiento en el tablero
+        val nuevoTablero = ejecutarMovimiento(movimiento)
+
+        return this.copy(tablero = nuevoTablero)
+    }
+    
+    // ==========================================
+    // VALIDACIONES DE MOVIMIENTOS
+    // ==========================================
+    
     private fun validarMovimiento(jugador: Jugador, movimiento: Movimiento) {
-        // Validar que las coordenadas estén dentro del tablero
         if (!movimiento.esColocacion) {
             require(tablero.coordenadasValidas(movimiento.filaOrigen, movimiento.columnaOrigen)) {
                 "Coordenadas de origen (${movimiento.filaOrigen}, ${movimiento.columnaOrigen}) fuera del tablero"
             }
         }
-        
         require(tablero.coordenadasValidas(movimiento.filaDestino, movimiento.columnaDestino)) {
             "Coordenadas de destino (${movimiento.filaDestino}, ${movimiento.columnaDestino}) fuera del tablero"
         }
         
-        // Aplicar validaciones específicas según el tipo de juego
         when (tipoJuego) {
             TipoJuego.TRES_EN_LINEA -> validarMovimientoTresEnLinea(movimiento)
             TipoJuego.AJEDREZ -> validarMovimientoAjedrez(jugador, movimiento)
@@ -139,73 +132,33 @@ data class Juego(
         }
     }
     
-    /**
-     * Validaciones específicas para tres en línea
-     */
     private fun validarMovimientoTresEnLinea(movimiento: Movimiento) {
-        require(movimiento.esColocacion) { 
-            "En tres en línea solo se pueden hacer colocaciones, no movimientos" 
-        }
-        
+        require(movimiento.esColocacion) { "En tres en línea solo se pueden hacer colocaciones" }
         require(tablero.estaVacia(movimiento.filaDestino, movimiento.columnaDestino)) {
             "La celda (${movimiento.filaDestino}, ${movimiento.columnaDestino}) ya está ocupada"
         }
-        
-        require(movimiento.contenido != null && movimiento.contenido.isNotBlank()) {
-            "Debe especificar el contenido a colocar (X u O)"
-        }
+        require(!movimiento.contenido.isNullOrBlank()) { "Debe especificar el contenido (X u O)" }
     }
     
-    /**
-     * Validaciones específicas para ajedrez (simplificadas)
-     */
     private fun validarMovimientoAjedrez(jugador: Jugador, movimiento: Movimiento) {
-        require(!movimiento.esColocacion) { 
-            "En ajedrez se deben mover piezas existentes" 
-        }
-        
-        // Verificar que hay una pieza en el origen
-        require(!tablero.estaVacia(movimiento.filaOrigen, movimiento.columnaOrigen)) {
-            "No hay ninguna pieza en la posición de origen (${movimiento.filaOrigen}, ${movimiento.columnaOrigen})"
-        }
-        
-        // Verificar que la pieza le pertenece al jugador (simplificado)
-        val celdaOrigen = tablero.obtenerCelda(movimiento.filaOrigen, movimiento.columnaOrigen)
-        val piezaOrigen = celdaOrigen.contenido
-        
-        // En una implementación real, aquí validaríamos que la pieza pertenece al jugador
-        // y que el movimiento es válido para ese tipo de pieza
-        
-        // Si hay una pieza en el destino, verificar que no sea del mismo jugador
-        if (!tablero.estaVacia(movimiento.filaDestino, movimiento.columnaDestino)) {
-            // Aquí iría la lógica para verificar que se puede capturar la pieza
-        }
-    }
-    
-    /**
-     * Validaciones específicas para damas
-     */
-    private fun validarMovimientoDamas(jugador: Jugador, movimiento: Movimiento) {
-        require(!movimiento.esColocacion) { 
-            "En damas se deben mover piezas existentes" 
-        }
-        
+        require(!movimiento.esColocacion) { "En ajedrez se deben mover piezas existentes" }
         require(!tablero.estaVacia(movimiento.filaOrigen, movimiento.columnaOrigen)) {
             "No hay ninguna pieza en la posición de origen"
         }
-        
-        require(movimiento.esDiagonal()) {
-            "En damas solo se permiten movimientos diagonales"
+        // Aquí iría lógica más compleja de validación de ajedrez
+    }
+    
+    private fun validarMovimientoDamas(jugador: Jugador, movimiento: Movimiento) {
+        require(!movimiento.esColocacion) { "En damas se deben mover piezas existentes" }
+        require(!tablero.estaVacia(movimiento.filaOrigen, movimiento.columnaOrigen)) {
+            "No hay ninguna pieza en la posición de origen"
         }
-        
+        require(movimiento.esDiagonal()) { "En damas solo se permiten movimientos diagonales" }
         require(tablero.estaVacia(movimiento.filaDestino, movimiento.columnaDestino)) {
             "El destino debe estar vacío (excepto para capturas)"
         }
     }
     
-    /**
-     * Validaciones genéricas
-     */
     private fun validarMovimientoGenerico(movimiento: Movimiento) {
         if (movimiento.esColocacion) {
             require(tablero.estaVacia(movimiento.filaDestino, movimiento.columnaDestino)) {
@@ -218,166 +171,78 @@ data class Juego(
         }
     }
     
-    /**
-     * Ejecuta el movimiento en el tablero
-     */
-    private fun ejecutarMovimiento(movimiento: Movimiento) {
+    // ==========================================
+    // EJECUCIÓN DE MOVIMIENTOS
+    // ==========================================
+    
+    private fun ejecutarMovimiento(movimiento: Movimiento): Tablero {
+        val nuevoTablero = Tablero(tablero.filas, tablero.columnas)
+        for (fila in 0 until tablero.filas) {
+            for (columna in 0 until tablero.columnas) {
+                val celda = tablero.obtenerCelda(fila, columna)
+                if (!celda.estaVacia) {
+                    nuevoTablero.colocarEnCelda(fila, columna, celda.contenido!!)
+                }
+            }
+        }
         if (movimiento.esColocacion) {
-            // Es una colocación simple
-            tablero.colocarEnCelda(
-                movimiento.filaDestino, 
-                movimiento.columnaDestino, 
-                movimiento.contenido!!
-            )
+            nuevoTablero.colocarEnCelda(movimiento.filaDestino, movimiento.columnaDestino, movimiento.contenido!!)
         } else {
-            // Es un movimiento con origen y destino
-            val celdaOrigen = tablero.obtenerCelda(movimiento.filaOrigen, movimiento.columnaOrigen)
-            val contenidoAMover = celdaOrigen.contenido ?: ""
-            
-            // Vaciar la posición de origen
-            tablero.vaciarCelda(movimiento.filaOrigen, movimiento.columnaOrigen)
-            
-            // Colocar en el destino
-            tablero.colocarEnCelda(movimiento.filaDestino, movimiento.columnaDestino, contenidoAMover)
+            val contenidoAMover = tablero.obtenerCelda(movimiento.filaOrigen, movimiento.columnaOrigen).contenido ?: ""
+            nuevoTablero.vaciarCelda(movimiento.filaOrigen, movimiento.columnaOrigen)
+            nuevoTablero.colocarEnCelda(movimiento.filaDestino, movimiento.columnaDestino, contenidoAMover)
         }
-    }
-    
-    /**
-     * Verifica si es el turno del jugador especificado
-     */
-    fun esturnoDelJugador(jugador: Jugador): Boolean {
-        return jugadorEnTurno?.id == jugador.id
-    }
-    
-    /**
-     * Calcula el índice del siguiente jugador
-     */
-    private fun calcularSiguienteJugador(): Int {
-        if (jugadores.isEmpty()) return 0
-        
-        var siguienteIndice = (jugadorActual + 1) % jugadores.size
-        
-        // Saltar jugadores desconectados
-        var intentos = 0
-        while (!jugadores[siguienteIndice].conectado && intentos < jugadores.size) {
-            siguienteIndice = (siguienteIndice + 1) % jugadores.size
-            intentos++
-        }
-        
-        return siguienteIndice
-    }
-    
-    /**
-     * Avanza al siguiente turno manualmente
-     */
-    fun siguienteTurno(): Juego {
-        require(estado == EstadoJuego.EN_CURSO) { "El juego debe estar en curso para avanzar turnos" }
-        return this.copy(jugadorActual = calcularSiguienteJugador())
+        return nuevoTablero
     }
     
     // ==========================================
-    // MÉTODOS EXISTENTES CONSERVADOS
+    // MÉTODOS AUXILIARES
     // ==========================================
     
-    /**
-     * Obtener el estado actual del tablero como string
-     */
-    fun verTablero(): String {
-        return tablero.mostrarTablero()
-    }
+    fun esturnoDelJugador(jugador: Jugador): Boolean = jugadorEnTurno?.id == jugador.id
     
-    /**
-     * Verificar si una posición específica está disponible
-     */
-    fun posicionDisponible(fila: Int, columna: Int): Boolean {
-        return tablero.coordenadasValidas(fila, columna) && tablero.estaVacia(fila, columna)
-    }
+    fun verTablero(): String = tablero.mostrarTablero()
     
-    /**
-     * Obtener todas las posiciones vacías disponibles
-     */
-    fun posicionesDisponibles(): List<Pair<Int, Int>> {
-        return tablero.obtenerCeldasVacias().map { Pair(it.fila, it.columna) }
-    }
+    fun posicionDisponible(fila: Int, columna: Int): Boolean =
+        tablero.coordenadasValidas(fila, columna) && tablero.estaVacia(fila, columna)
     
-    /**
-     * Limpiar el tablero (útil para reiniciar partida)
-     */
-    fun reiniciarTablero(): Juego {
-        tablero.limpiarTablero()
-        return this.copy(rondaActual = 1, jugadorActual = 0)
-    }
+    fun posicionesDisponibles(): List<Pair<Int, Int>> =
+        tablero.obtenerCeldasVacias().map { it.fila to it.columna }
     
-    /**
-     * Función para agregar un jugador al juego
-     */
+    fun reiniciarTablero(): Juego =
+        this.copy(tablero = Tablero(tablero.filas, tablero.columnas), rondaActual = 1, jugadorActual = 0)
+    
     fun agregarJugador(jugador: Jugador): Juego {
         require(!estaLleno) { "El juego ya está lleno" }
-        require(estado == EstadoJuego.ESPERANDO_JUGADORES) { 
-            "No se pueden agregar jugadores cuando el juego está en estado: $estado" 
-        }
-        require(!jugadores.any { it.id == jugador.id }) { 
-            "Ya existe un jugador con el ID: ${jugador.id}" 
-        }
-        
-        val nuevosJugadores = jugadores.toMutableList().apply { add(jugador) }
-        return this.copy(jugadores = nuevosJugadores)
+        require(estado == EstadoJuego.ESPERANDO_JUGADORES) { "No se pueden agregar jugadores en estado $estado" }
+        require(!jugadores.any { it.id == jugador.id }) { "Ya existe un jugador con ID ${jugador.id}" }
+        return this.copy(jugadores = jugadores + jugador)
     }
     
-    /**
-     * Función para remover un jugador del juego
-     */
     fun removerJugador(jugadorId: Long): Juego {
-        val nuevosJugadores = jugadores.filter { it.id != jugadorId }.toMutableList()
-        val nuevoJugadorActual = if (jugadorActual >= nuevosJugadores.size) 0 else jugadorActual
-        return this.copy(jugadores = nuevosJugadores, jugadorActual = nuevoJugadorActual)
+        val nuevosJugadores = jugadores.filter { it.id != jugadorId }
+        val nuevoIndice = if (jugadorActual >= nuevosJugadores.size) 0 else jugadorActual
+        return this.copy(jugadores = nuevosJugadores, jugadorActual = nuevoIndice)
     }
     
-    /**
-     * Función para cambiar el estado del juego
-     */
     fun cambiarEstado(nuevoEstado: EstadoJuego): Juego {
         when (estado) {
-            EstadoJuego.ESPERANDO_JUGADORES -> {
-                require(
-                    nuevoEstado in listOf(EstadoJuego.EN_CURSO, EstadoJuego.CANCELADO)
-                ) { "Transición inválida de $estado a $nuevoEstado" }
-            }
-            EstadoJuego.EN_CURSO -> {
-                require(
-                    nuevoEstado in listOf(EstadoJuego.PAUSADO, EstadoJuego.FINALIZADO, EstadoJuego.CANCELADO)
-                ) { "Transición inválida de $estado a $nuevoEstado" }
-            }
-            EstadoJuego.PAUSADO -> {
-                require(
-                    nuevoEstado in listOf(EstadoJuego.EN_CURSO, EstadoJuego.CANCELADO)
-                ) { "Transición inválida de $estado a $nuevoEstado" }
-            }
-            EstadoJuego.FINALIZADO, EstadoJuego.CANCELADO -> {
-                throw IllegalStateException("No se puede cambiar el estado desde $estado")
-            }
+            EstadoJuego.ESPERANDO_JUGADORES -> require(nuevoEstado in listOf(EstadoJuego.EN_CURSO, EstadoJuego.CANCELADO))
+            EstadoJuego.EN_CURSO -> require(nuevoEstado in listOf(EstadoJuego.PAUSADO, EstadoJuego.FINALIZADO, EstadoJuego.CANCELADO))
+            EstadoJuego.PAUSADO -> require(nuevoEstado in listOf(EstadoJuego.EN_CURSO, EstadoJuego.CANCELADO))
+            EstadoJuego.FINALIZADO, EstadoJuego.CANCELADO -> throw IllegalStateException("No se puede cambiar el estado desde $estado")
         }
-        
         return this.copy(estado = nuevoEstado)
     }
     
-    /**
-     * Función para iniciar el juego
-     */
     fun iniciarJuego(): Juego {
         require(jugadores.isNotEmpty()) { "No se puede iniciar un juego sin jugadores" }
-        require(estado == EstadoJuego.ESPERANDO_JUGADORES) { 
-            "El juego debe estar esperando jugadores para iniciarse" 
-        }
-        
+        require(estado == EstadoJuego.ESPERANDO_JUGADORES) { "El juego debe estar esperando jugadores" }
         return this.copy(estado = EstadoJuego.EN_CURSO)
     }
     
-    /**
-     * Función para avanzar a la siguiente ronda
-     */
     fun siguienteRonda(): Juego {
-        require(estado == EstadoJuego.EN_CURSO) { "El juego debe estar en curso para avanzar de ronda" }
+        require(estado == EstadoJuego.EN_CURSO) { "El juego debe estar en curso para avanzar ronda" }
         return this.copy(rondaActual = rondaActual + 1, jugadorActual = 0)
     }
 }
@@ -386,8 +251,5 @@ data class Juego(
  * Enum para diferentes tipos de juego que requieren validaciones específicas
  */
 enum class TipoJuego {
-    GENERICO,      // Juego genérico con validaciones mínimas
-    TRES_EN_LINEA, // Tres en línea (solo colocaciones)
-    AJEDREZ,       // Ajedrez (movimientos complejos)
-    DAMAS          // Damas (movimientos diagonales)
+    GENERICO, TRES_EN_LINEA, AJEDREZ, DAMAS
 }
