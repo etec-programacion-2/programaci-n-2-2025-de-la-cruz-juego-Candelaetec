@@ -69,6 +69,16 @@ fun main() {
         
         println("✅ Movimiento exitoso!")
         println(juego.verTablero())
+
+        // Test de error: intentar colocar en una celda ocupada
+        println("\n🧪 Test 4: Intentar colocar en celda ocupada (debe fallar)")
+        try {
+            val movimientoInvalido = Movimiento.colocacion(0, 0, "O")
+            juego = juego.realizarMovimiento(jugador2, movimientoInvalido)
+            println("❌ ERROR: Se permitió un movimiento inválido")
+        } catch (e: Exception) {
+            println("✅ Error correctamente capturado: ${e.message}")
+        }
         
         println("\n🎉 ¡Todos los tests pasaron exitosamente!")
         
