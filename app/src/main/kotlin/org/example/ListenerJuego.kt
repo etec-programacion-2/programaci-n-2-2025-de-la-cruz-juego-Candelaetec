@@ -16,7 +16,7 @@ interface ListenerJuego {
      * @param jugador El jugador que realizó el movimiento
      * @param movimiento El movimiento que se realizó
      */
-    fun onMovimiento(juego: Juego, jugador: Jugador, movimiento: Movimiento) {}
+    fun onMovimiento(juego: Juego, jugador: Jugador, movimiento: Movimiento) = Unit
     
     /**
      * Se ejecuta cuando el turno cambia a otro jugador
@@ -25,7 +25,7 @@ interface ListenerJuego {
      * @param jugadorAnterior El jugador cuyo turno acaba de terminar (puede ser null)
      * @param jugadorActual El jugador cuyo turno comienza ahora (puede ser null)
      */
-    fun onTurnoCambiado(juego: Juego, jugadorAnterior: Jugador?, jugadorActual: Jugador?) {}
+    fun onTurnoCambiado(juego: Juego, jugadorAnterior: Jugador?, jugadorActual: Jugador?) = Unit
     
     /**
      * Se ejecuta cuando el juego termina (victoria, empate, etc.)
@@ -34,7 +34,7 @@ interface ListenerJuego {
      * @param ganador El jugador ganador, o null si fue empate
      * @param razonFinalizacion Descripción de por qué terminó el juego
      */
-    fun onJuegoTerminado(juego: Juego, ganador: Jugador?, razonFinalizacion: String) {}
+    fun onJuegoTerminado(juego: Juego, ganador: Jugador?, razonFinalizacion: String) = Unit
     
     /**
      * Se ejecuta cuando un jugador se conecta o desconecta
@@ -43,7 +43,7 @@ interface ListenerJuego {
      * @param jugador El jugador que cambió su estado de conexión
      * @param conectado true si se conectó, false si se desconectó
      */
-    fun onEstadoConexionCambiado(juego: Juego, jugador: Jugador, conectado: Boolean) {}
+    fun onEstadoConexionCambiado(juego: Juego, jugador: Jugador, conectado: Boolean) = Unit
     
     /**
      * Se ejecuta cuando se agrega un nuevo jugador al juego
@@ -51,7 +51,7 @@ interface ListenerJuego {
      * @param juego Estado actual del juego
      * @param jugador El jugador que se agregó
      */
-    fun onJugadorAgregado(juego: Juego, jugador: Jugador) {}
+    fun onJugadorAgregado(juego: Juego, jugador: Jugador) = Unit
     
     /**
      * Se ejecuta cuando se remueve un jugador del juego
@@ -59,7 +59,7 @@ interface ListenerJuego {
      * @param juego Estado actual del juego
      * @param jugador El jugador que se removió
      */
-    fun onJugadorRemovido(juego: Juego, jugador: Jugador) {}
+    fun onJugadorRemovido(juego: Juego, jugador: Jugador) = Unit
     
     /**
      * Se ejecuta cuando el estado del juego cambia (ej: ESPERANDO_JUGADORES -> EN_CURSO)
@@ -68,7 +68,7 @@ interface ListenerJuego {
      * @param estadoAnterior El estado anterior del juego
      * @param estadoNuevo El nuevo estado del juego
      */
-    fun onEstadoJuegoCambiado(juego: Juego, estadoAnterior: EstadoJuego, estadoNuevo: EstadoJuego) {}
+    fun onEstadoJuegoCambiado(juego: Juego, estadoAnterior: EstadoJuego, estadoNuevo: EstadoJuego) = Unit
     
     /**
      * Se ejecuta cuando ocurre un error durante el procesamiento de un movimiento
@@ -78,7 +78,7 @@ interface ListenerJuego {
      * @param movimiento El movimiento que falló
      * @param error La excepción que se produjo
      */
-    fun onErrorMovimiento(juego: Juego, jugador: Jugador, movimiento: Movimiento, error: Exception) {}
+    fun onErrorMovimiento(juego: Juego, jugador: Jugador, movimiento: Movimiento, error: Exception) = Unit
     
     /**
      * Se ejecuta cuando se inicia una nueva ronda
@@ -86,7 +86,7 @@ interface ListenerJuego {
      * @param juego Estado actual del juego
      * @param numeroRonda El número de la nueva ronda
      */
-    fun onNuevaRonda(juego: Juego, numeroRonda: Int) {}
+    fun onNuevaRonda(juego: Juego, numeroRonda: Int) = Unit
     
     /**
      * Se ejecuta cuando el juego se pausa o reanuda
@@ -94,7 +94,7 @@ interface ListenerJuego {
      * @param juego Estado actual del juego
      * @param pausado true si se pausó, false si se reanudó
      */
-    fun onJuegoPausado(juego: Juego, pausado: Boolean) {}
+    fun onJuegoPausado(juego: Juego, pausado: Boolean) = Unit
 }
 
 /**
@@ -147,7 +147,7 @@ class LoggerListener : ListenerJuegoBase() {
     
     override fun onJuegoTerminado(juego: Juego, ganador: Jugador?, razonFinalizacion: String) {
         val resultado = ganador?.let { "Ganó ${it.nombre}" } ?: "Empate"
-        println("🏁 [${obtenerTimestamp()}] Juego terminado: $resultado ($razonFinalizacion)")
+        println("🏁 [${obtenerTimestamp()}] org.example.Juego terminado: $resultado ($razonFinalizacion)")
     }
     
     override fun onEstadoConexionCambiado(juego: Juego, jugador: Jugador, conectado: Boolean) {
@@ -177,7 +177,7 @@ class LoggerListener : ListenerJuegoBase() {
     
     override fun onJuegoPausado(juego: Juego, pausado: Boolean) {
         val accion = if (pausado) "pausado" else "reanudado"
-        println("⏸️ [${obtenerTimestamp()}] Juego $accion")
+        println("⏸️ [${obtenerTimestamp()}] org.example.Juego $accion")
     }
     
     private fun obtenerTimestamp(): String {

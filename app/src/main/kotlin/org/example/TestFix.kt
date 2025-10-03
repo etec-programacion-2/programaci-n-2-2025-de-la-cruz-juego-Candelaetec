@@ -38,8 +38,7 @@ fun main() {
         // Crear juego
         var juego = Juego(
             id = "TEST-001",
-            filasTablero = 3,
-            columnasTablero = 3,
+            tablero = Tablero(3, 3),
             maxJugadores = 2,
             tipoJuego = TipoJuego.TRES_EN_LINEA
         )
@@ -47,7 +46,7 @@ fun main() {
         // Agregar jugadores e iniciar
         juego = juego.agregarJugador(jugador1).agregarJugador(jugador2).iniciarJuego()
         
-        println("Juego creado: ${juego.id}")
+        println("org.example.Juego creado: ${juego.id}")
         println("Tablero inicial:")
         println(juego.verTablero())
         
