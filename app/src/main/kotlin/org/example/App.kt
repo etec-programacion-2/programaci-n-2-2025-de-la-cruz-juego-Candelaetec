@@ -14,12 +14,12 @@ fun main() {
     // 2. Crear un juego con tablero 3x3 (como tres en línea)
     var juego = Juego(
         id = "PARTIDA-001",
-        filasTablero = 3,
-        columnasTablero = 3,
-        maxJugadores = 2
+        tablero = Tablero(3, 3),
+        maxJugadores = 2,
+        tipoJuego = TipoJuego.TRES_EN_LINEA
     )
     
-    println("Juego creado: ${juego.id}")
+    println("org.example.Juego creado: ${juego.id}")
     println("Estado inicial: ${juego.estado}")
     println("Tablero inicial:")
     println(juego.verTablero())
@@ -32,7 +32,7 @@ fun main() {
     
     // 4. Iniciar el juego
     juego = juego.iniciarJuego()
-    println("¡Juego iniciado! Estado: ${juego.estado}\n")
+    println("¡org.example.Juego iniciado! Estado: ${juego.estado}\n")
     
     // 5. Simular algunos movimientos en el tablero
     println("=== SIMULACIÓN DE MOVIMIENTOS ===")
@@ -80,9 +80,9 @@ fun main() {
     println("\n=== JUEGO DE AJEDREZ (8x8) ===")
     var juegoAjedrez = Juego(
         id = "AJEDREZ-001",
-        filasTablero = 8,
-        columnasTablero = 8,
-        maxJugadores = 2
+        tablero = Tablero(8, 8),
+        maxJugadores = 2,
+        tipoJuego = TipoJuego.AJEDREZ
     )
     
     juegoAjedrez = juegoAjedrez.agregarJugador(
@@ -106,4 +106,14 @@ fun main() {
     println(juegoAjedrez.verTablero())
     
     println("Estado del juego de ajedrez: $juegoAjedrez")
+}
+
+/**
+ * Enum para diferentes tipos de juego que requieren validaciones específicas
+ */
+enum class TipoJuego {
+    GENERICO,      // Juego genérico con validaciones mínimas
+    TRES_EN_LINEA, // Tres en línea (solo colocaciones)
+    AJEDREZ,       // Ajedrez (movimientos complejos)
+    DAMAS          // Damas (movimientos diagonales)
 }

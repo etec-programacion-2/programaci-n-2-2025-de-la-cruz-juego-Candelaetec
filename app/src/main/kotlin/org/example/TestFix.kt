@@ -38,8 +38,7 @@ fun main() {
         // Crear juego
         var juego = Juego(
             id = "TEST-001",
-            filasTablero = 3,
-            columnasTablero = 3,
+            tablero = Tablero(3, 3),
             maxJugadores = 2,
             tipoJuego = TipoJuego.TRES_EN_LINEA
         )
@@ -47,7 +46,7 @@ fun main() {
         // Agregar jugadores e iniciar
         juego = juego.agregarJugador(jugador1).agregarJugador(jugador2).iniciarJuego()
         
-        println("Juego creado: ${juego.id}")
+        println("org.example.Juego creado: ${juego.id}")
         println("Tablero inicial:")
         println(juego.verTablero())
         
@@ -69,6 +68,16 @@ fun main() {
         
         println("✅ Movimiento exitoso!")
         println(juego.verTablero())
+
+        // Test de error: intentar colocar en una celda ocupada
+        println("\n🧪 Test 4: Intentar colocar en celda ocupada (debe fallar)")
+        try {
+            val movimientoInvalido = Movimiento.colocacion(0, 0, "O")
+            juego = juego.realizarMovimiento(jugador2, movimientoInvalido)
+            println("❌ ERROR: Se permitió un movimiento inválido")
+        } catch (e: Exception) {
+            println("✅ Error correctamente capturado: ${e.message}")
+        }
         
         println("\n🎉 ¡Todos los tests pasaron exitosamente!")
         
