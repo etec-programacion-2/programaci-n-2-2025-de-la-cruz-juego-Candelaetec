@@ -1,5 +1,9 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
+
+@Serializable
 data class Juego(
     val id: String,
     val tablero: Tablero,
@@ -10,7 +14,7 @@ data class Juego(
     val maxJugadores: Int = 4,
     val rondaActual: Int = 1,
     val tipoJuego: TipoJuego = TipoJuego.GENERICO,
-    private val listeners: List<ListenerJuego> = listOf()
+    @Transient private val listeners: List<ListenerJuego> = listOf()
 ) {
 
     val jugadoresConectados: List<Jugador>

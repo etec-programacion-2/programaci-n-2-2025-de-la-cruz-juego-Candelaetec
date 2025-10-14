@@ -1,5 +1,7 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+
 /**
  * Data class que representa una celda individual en el tablero
  * 
@@ -7,6 +9,7 @@ package org.example
  * @param columna Posición de la columna (0-indexed)
  * @param contenido Contenido de la celda (puede ser null si está vacía)
  */
+@Serializable
 data class Celda(
     val fila: Int,
     val columna: Int,

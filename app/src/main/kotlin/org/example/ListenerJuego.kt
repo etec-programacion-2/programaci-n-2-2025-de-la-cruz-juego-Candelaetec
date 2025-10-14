@@ -1,5 +1,8 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 /**
  * Interfaz que define los eventos que pueden ocurrir durante un juego.
  * Implementa el patrón Observer para desacoplar la lógica del juego de la interfaz de usuario.
@@ -108,14 +111,16 @@ abstract class ListenerJuegoBase : ListenerJuego {
 /**
  * Clase de datos que encapsula información sobre un evento del juego
  */
+@Serializable
 data class EventoJuego(
     val tipo: TipoEvento,
     val juego: Juego,
     val timestamp: Long = System.currentTimeMillis(),
     val jugador: Jugador? = null,
     val movimiento: Movimiento? = null,
-    val datos: Map<String, Any> = emptyMap()
+    val datos: Map<String, JsonElement> = emptyMap()
 ) {
+    @Serializable
     enum class TipoEvento {
         MOVIMIENTO_REALIZADO,
         TURNO_CAMBIADO,
@@ -292,8 +297,8 @@ class HistorialListener : ListenerJuegoBase() {
                 jugador = jugador,
                 movimiento = movimiento,
                 datos = mapOf(
-                    "ronda" to juego.rondaActual,
-                    "turno" to juego.jugadorActual
+                    "ronda" to JsonPrimitive(juego.rondaActual),
+                    "turno" to JsonPrimitive(juego.jugadorActual)
                 )
             )
         )
@@ -306,8 +311,8 @@ class HistorialListener : ListenerJuegoBase() {
                 juego = juego,
                 jugador = ganador,
                 datos = mapOf(
-                    "razon" to razonFinalizacion,
-                    "duracion_movimientos" to historial.count { it.tipo == EventoJuego.TipoEvento.MOVIMIENTO_REALIZADO }
+                    "razon" to JsonPrimitive(razonFinalizacion),
+                    "duracion_movimientos" to JsonPrimitive(historial.count { it.tipo == EventoJuego.TipoEvento.MOVIMIENTO_REALIZADO })
                 )
             )
         )
