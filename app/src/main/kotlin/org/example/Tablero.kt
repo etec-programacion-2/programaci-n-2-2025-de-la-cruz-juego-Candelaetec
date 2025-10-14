@@ -1,5 +1,7 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+
 /**
  * Clase que representa el tablero del juego
  * 
@@ -9,6 +11,7 @@ package org.example
  * @param filas Número de filas del tablero
  * @param columnas Número de columnas del tablero
  */
+@Serializable
 class Tablero(
     val filas: Int,
     val columnas: Int

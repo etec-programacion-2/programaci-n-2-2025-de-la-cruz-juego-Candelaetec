@@ -1,5 +1,7 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+
 /**
  * Data class que representa un movimiento en el tablero
  *
@@ -12,6 +14,7 @@ package org.example
  * @param columnaDestino Columna de la posición de destino (0-indexed)
  * @param contenido Contenido/pieza que se está moviendo (opcional para algunos tipos de juego)
  */
+@Serializable
 data class Movimiento(
     val filaOrigen: Int,
     val columnaOrigen: Int,

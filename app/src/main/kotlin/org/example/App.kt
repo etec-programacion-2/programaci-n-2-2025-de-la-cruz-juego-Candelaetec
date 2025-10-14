@@ -1,5 +1,8 @@
 package org.example
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 fun main() {
     println("=== JUEGO COMPLETO CON TABLERO ===\n")
     
@@ -18,6 +21,15 @@ fun main() {
     val partidaConDos = ServicioPartidas.unirseAPartida(partidaCreada.id, jugador2)
     println("Jugadores en la partida: ${partidaConDos?.jugadores?.size}")
     println("Partidas activas: ${ServicioPartidas.listarPartidas().map { it.id }}\n")
+
+    // Demo JSON de protocolo (serialización/deserialización)
+    println("=== DEMO Protocolo/JSON ===")
+    val comandoCrear = Comando.CrearPartida(jugador1)
+    val jsonFmt = Json { classDiscriminator = "tipo" }
+    val jsonCrear = jsonFmt.encodeToString<Comando>(comandoCrear)
+    println("JSON CrearPartida: $jsonCrear")
+    val comandoCrearDecoded = jsonFmt.decodeFromString<Comando>(jsonCrear)
+    println("Roundtrip CrearPartida -> ${comandoCrearDecoded::class.simpleName}\n")
 
     // 2. Crear un juego con tablero 3x3 (como tres en línea)
     var juego = Juego(

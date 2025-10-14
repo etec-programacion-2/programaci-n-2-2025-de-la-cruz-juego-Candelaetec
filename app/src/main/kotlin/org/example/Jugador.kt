@@ -1,5 +1,7 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+
 /**
  * Data class que representa a un jugador en el sistema
  * 
@@ -8,6 +10,7 @@ package org.example
  * @param puntuacion Puntuación actual del jugador (por defecto 0)
  * @param conectado Estado de conexión del jugador (por defecto true)
  */
+@Serializable
 data class Jugador(
     val id: Long,
     val nombre: String,
