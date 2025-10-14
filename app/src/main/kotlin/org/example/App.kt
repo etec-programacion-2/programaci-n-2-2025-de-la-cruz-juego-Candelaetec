@@ -124,4 +124,4 @@ enum class TipoJuego {
     TRES_EN_LINEA, // Tres en línea (solo colocaciones)
     AJEDREZ,       // Ajedrez (movimientos complejos)
     DAMAS          // Damas (movimientos diagonales)
-}
+} 
