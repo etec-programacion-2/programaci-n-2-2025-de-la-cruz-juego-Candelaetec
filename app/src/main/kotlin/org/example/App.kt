@@ -11,6 +11,14 @@ fun main() {
     println("- ${jugador1.nombre} (ID: ${jugador1.id})")
     println("- ${jugador2.nombre} (ID: ${jugador2.id})\n")
     
+    // Demo rápido: uso de ServicioPartidas como orquestador central
+    println("=== DEMO ServicioPartidas ===")
+    val partidaCreada = ServicioPartidas.crearPartida(jugador1)
+    println("Partida creada vía ServicioPartidas: ${partidaCreada.id}")
+    val partidaConDos = ServicioPartidas.unirseAPartida(partidaCreada.id, jugador2)
+    println("Jugadores en la partida: ${partidaConDos?.jugadores?.size}")
+    println("Partidas activas: ${ServicioPartidas.listarPartidas().map { it.id }}\n")
+
     // 2. Crear un juego con tablero 3x3 (como tres en línea)
     var juego = Juego(
         id = "PARTIDA-001",
