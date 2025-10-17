@@ -51,6 +51,20 @@ application {
     mainClass = "org.example.AppKt"
 }
 
+tasks.register<JavaExec>("runServer") {
+    group = "application"
+    description = "Run socket server"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.example.ServidorMainKt")
+}
+
+tasks.register<JavaExec>("runClient") {
+    group = "application"
+    description = "Run console client"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.example.ClienteMainKt")
+}
+
 tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()

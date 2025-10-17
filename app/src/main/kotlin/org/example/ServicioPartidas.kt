@@ -55,6 +55,11 @@ object ServicioPartidas {
         partidasActivas.remove(idPartida)
     }
 
+    /** Reemplaza el estado de una partida activa (si existe). */
+    fun actualizarPartida(juego: Juego) {
+        partidasActivas[juego.id] = juego
+    }
+
     private fun generarIdPartida(): String {
         return "PARTIDA-" + java.util.UUID.randomUUID().toString().substring(0, 8).uppercase()
     }
