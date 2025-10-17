@@ -17,6 +17,9 @@ sealed class Comando {
     data class UnirseAPartida(val idPartida: String, val jugador: Jugador) : Comando()
 
     @Serializable
+    data class UnirseAPartidaAuto(val jugador: Jugador) : Comando()
+
+    @Serializable
     data class RealizarMovimiento(
         val idPartida: String,
         val jugadorId: Long,
