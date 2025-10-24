@@ -17,7 +17,12 @@ dependencies {
 }
 
 application {
-    mainClass.set("org.example.AppKt")
+    mainClass.set("org.example.ClienteConsolaKt")
+}
+
+// Configurar la tarea 'run' para permitir input interactivo
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
 }
 
 // Ignoramos tests que rompen el build
@@ -48,7 +53,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.AppKt"
+    mainClass = "org.example.ClienteConsolaKt"
 }
 
 tasks.register<JavaExec>("runServer") {
