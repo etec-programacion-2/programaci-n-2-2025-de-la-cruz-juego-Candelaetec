@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.0.21"
     kotlin("plugin.serialization") version "2.0.21"
     application
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 group = "org.example"
@@ -14,6 +15,10 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    // JavaFX dependencies
+    implementation("org.openjfx:javafx-controls:21.0.2")
+    implementation("org.openjfx:javafx-fxml:21.0.2")
 }
 
 application {
@@ -23,6 +28,12 @@ application {
 // Configurar la tarea 'run' para permitir input interactivo
 tasks.named<JavaExec>("run") {
     standardInput = System.`in`
+}
+
+// Configurar JavaFX
+javafx {
+    version = "21.0.2"
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 // Ignoramos tests que rompen el build
@@ -68,6 +79,13 @@ tasks.register<JavaExec>("runClient") {
     description = "Run console client"
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.example.ClienteMainKt")
+}
+
+tasks.register<JavaExec>("runGUI") {
+    group = "application"
+    description = "Run GUI client"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.example.ClienteGUIMainKt")
 }
 
 tasks.named<Test>("test") {
