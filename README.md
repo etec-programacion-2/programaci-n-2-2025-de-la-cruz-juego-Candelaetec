@@ -42,14 +42,8 @@ ls -la
 
 ### Paso 1: Clonar/Descargar el Proyecto
 ```bash
-# Opción A: Clonar desde GitHub (si está disponible)
-git clone https://github.com/tu-usuario/programaci-n-2-2025-de-la-cruz-juego-Candelaetec.git
-cd programaci-n-2-2025-de-la-cruz-juego-Candelaetec
-
-# Opción B: Descargar ZIP desde GitHub o plataforma educativa
-# Descomprimir el archivo ZIP descargado
-unzip programaci-n-2-2025-de-la-cruz-juego-Candelaetec.zip
-cd programaci-n-2-2025-de-la-cruz-juego-Candelaetec
+git@github.com:etec-programacion-2/programaci-n-2-2025-de-la-cruz-juego-Candelaetec.git
+cd programaci-n-2-2025-de-la-cruz-juego-Candelaetec.git
 ```
 
 ### Paso 2: Verificar Estructura del Proyecto
@@ -117,8 +111,6 @@ Esto ejecutará el menú principal del cliente consola para una experiencia inte
 ### Paso 1: Abrir Terminal para el Servidor
 ```bash
 # Terminal 1 - Navegar al directorio del proyecto
-cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
-
 # Verificar que estamos en el lugar correcto
 pwd
 # Debe terminar en: programaci-n-2-2025-de-la-cruz-juego-Candelaetec
@@ -154,7 +146,6 @@ ss -tlnp | grep 5050
 ### Opción 1: Menú Interactivo Completo (Recomendado para principiantes)
 ```bash
 # Terminal 2 - Cliente Consola Interactivo
-cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 ./gradlew run
 ```
 
@@ -209,7 +200,6 @@ cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 ### Paso 1: Ejecutar Cliente GUI
 ```bash
 # Terminal 3 - Cliente Gráfico
-cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 ./gradlew runGUI
 ```
 
@@ -246,14 +236,12 @@ En la ventana que se abre:
 
 #### Terminal 1: Servidor (mantener ejecutándose)
 ```bash
-cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 ./gradlew runServer --no-configuration-cache
 # Debe mostrar: Servidor escuchando en puerto 5050...
 ```
 
 #### Terminal 2: Cliente Consola (crea partida)
 ```bash
-cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 ./gradlew run
 # Seleccionar: 1. Crear nueva partida
 # Ingresar nombre: Alice
@@ -262,7 +250,6 @@ cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 
 #### Terminal 3: Cliente GUI (se une automáticamente)
 ```bash
-cd /ruta/completa/al/proyecto/programaci-n-2-2025-de-la-cruz-juego-Candelaetec
 ./gradlew runGUI
 # Nombre: Bob
 # Host: 127.0.0.1, Puerto: 5050 (ya configurado)
