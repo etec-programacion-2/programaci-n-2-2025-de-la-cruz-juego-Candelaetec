@@ -22,7 +22,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("org.example.ClienteConsolaKt")
+    mainClass.set("org.example.MainLauncherKt")
 }
 
 // Configurar la tarea 'run' para permitir input interactivo
@@ -64,7 +64,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.ClienteConsolaKt"
+    mainClass = "org.example.MainLauncherKt"
 }
 
 tasks.register<JavaExec>("runServer") {

@@ -2,6 +2,14 @@ package org.example
 
 /**
  * Servicio centralizado para orquestar el ciclo de vida de múltiples partidas.
+ * Implementa el patrón Singleton y principios SOLID.
+ *
+ * Principios SOLID aplicados:
+ * - S (Single Responsibility): Solo gestiona el ciclo de vida de partidas
+ * - O (Open-Closed): Extensible para nuevos tipos de juegos sin modificar el código existente
+ * - L (Liskov Substitution): Compatible con cualquier implementación de Juego
+ * - I (Interface Segregation): Métodos específicos para cada operación
+ * - D (Dependency Inversion): No depende de implementaciones concretas
  *
  * - Mantiene un registro de partidas activas en memoria
  * - Permite crear una nueva partida con un jugador inicial
@@ -13,7 +21,8 @@ package org.example
  * facilitar testeo, reemplazos y configuraciones.
  */
 object ServicioPartidas {
-    // Registro de partidas activas (thread-safe)
+
+    // Registro de partidas activas (encapsulado, thread-safe)
     private val partidasActivas = java.util.concurrent.ConcurrentHashMap<String, Juego>()
 
     /**
@@ -46,20 +55,33 @@ object ServicioPartidas {
         return actualizado
     }
 
-    /** Mantiene un registro de todas las partidas activas. */
+    /**
+     * Obtiene una partida por ID (encapsulado)
+     */
     fun obtenerPartida(idPartida: String): Juego? = partidasActivas[idPartida]
 
+    /**
+     * Lista todas las partidas activas (encapsulado)
+     */
     fun listarPartidas(): List<Juego> = partidasActivas.values.toList()
 
+    /**
+     * Finaliza una partida (encapsulado)
+     */
     fun finalizarPartida(idPartida: String) {
         partidasActivas.remove(idPartida)
     }
 
-    /** Reemplaza el estado de una partida activa (si existe). */
+    /**
+     * Actualiza el estado de una partida activa (encapsulado)
+     */
     fun actualizarPartida(juego: Juego) {
         partidasActivas[juego.id] = juego
     }
 
+    /**
+     * Genera un ID único para una nueva partida (privado, encapsulado)
+     */
     private fun generarIdPartida(): String {
         return "PARTIDA-" + java.util.UUID.randomUUID().toString().substring(0, 8).uppercase()
     }

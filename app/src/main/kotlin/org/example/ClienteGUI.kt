@@ -21,6 +21,7 @@ import kotlinx.serialization.decodeFromString
 
 /**
  * Cliente GUI con JavaFX para el juego de tablero multijugador.
+ * Hereda de ClienteBase para compartir funcionalidad común.
  *
  * Características:
  * - Interfaz gráfica intuitiva con JavaFX
@@ -30,6 +31,20 @@ import kotlinx.serialization.decodeFromString
  * - Estilos CSS para mejor apariencia
  */
 class ClienteGUI : Application() {
+
+    // Implementa la interfaz ClienteBase a través de composición
+    private val clienteBase = object : ClienteBase() {
+        override fun mostrarError(mensaje: String) {
+            Platform.runLater {
+                val alert = Alert(Alert.AlertType.ERROR).apply {
+                    title = "Error"
+                    headerText = null
+                    contentText = mensaje
+                }
+                alert.showAndWait()
+            }
+        }
+    }
 
     private val json = JsonConfig.default
     private var socket: Socket? = null
@@ -492,7 +507,8 @@ class ClienteGUI : Application() {
     }
 
     /**
-     * Muestra un diálogo de alerta
+     * Implementa el método abstracto de ClienteBase
+     * Polimorfismo: el cliente GUI muestra errores con diálogos
      */
     private fun mostrarAlerta(titulo: String, mensaje: String) {
         val alert = Alert(Alert.AlertType.ERROR).apply {
