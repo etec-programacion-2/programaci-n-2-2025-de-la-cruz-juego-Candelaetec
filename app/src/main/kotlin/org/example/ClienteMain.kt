@@ -16,56 +16,64 @@ import kotlinx.serialization.decodeFromString
  *   --id=PARTIDA-XXXX (para join/move)
  *   --fila=0 --columna=0 --contenido=X (para move)
  */
+class ClienteMain {
+
+    fun ejecutar(args: Array<String>) {
+        val opts = args.toOptions()
+        val host = opts["host"] ?: "127.0.0.1"
+        val puerto = (opts["port"] ?: "5050").toIntOrNull() ?: 5050
+        val cmdName = (opts["cmd"] ?: "create").lowercase()
+        val json = JsonConfig.default
+
+        val comando: Comando = when (cmdName) {
+            "create" -> {
+                val nombre = opts["name"] ?: "Cliente"
+                val playerId = (opts["playerId"] ?: "1001").toLongOrNull() ?: 1001L
+                Comando.CrearPartida(Jugador(id = playerId, nombre = nombre))
+            }
+            "join" -> {
+                val id = opts["id"] ?: return usage("Falta --id para join")
+                val nombre = opts["name"] ?: "Cliente"
+                val playerId = (opts["playerId"] ?: "1002").toLongOrNull() ?: 1002L
+                Comando.UnirseAPartida(idPartida = id, jugador = Jugador(id = playerId, nombre = nombre))
+            }
+            "joinauto", "joinauto" -> {
+                val nombre = opts["name"] ?: "Cliente"
+                val playerId = (opts["playerId"] ?: "1002").toLongOrNull() ?: 1002L
+                Comando.UnirseAPartidaAuto(jugador = Jugador(id = playerId, nombre = nombre))
+            }
+            "move" -> {
+                val id = opts["id"] ?: return usage("Falta --id para move")
+                val playerId = (opts["playerId"] ?: return usage("Falta --playerId para move")).toLongOrNull()
+                    ?: return usage("--playerId inválido")
+                val fila = (opts["fila"] ?: return usage("Falta --fila para move")).toIntOrNull()
+                    ?: return usage("--fila inválido")
+                val columna = (opts["columna"] ?: return usage("Falta --columna para move")).toIntOrNull()
+                    ?: return usage("--columna inválido")
+                val contenido = opts["contenido"] ?: return usage("Falta --contenido para move")
+                Comando.RealizarMovimiento(idPartida = id, jugadorId = playerId, fila = fila, columna = columna, contenido = contenido)
+            }
+            else -> return usage("--cmd debe ser create|join|joinAuto|move")
+        }
+
+        Socket(host, puerto).use { socket ->
+            val inReader = BufferedReader(InputStreamReader(socket.getInputStream()))
+            val outWriter = PrintWriter(socket.getOutputStream(), true)
+
+            outWriter.println(json.encodeToString<Comando>(comando))
+
+            val linea = inReader.readLine()
+            if (linea != null) {
+                val evento = json.decodeFromString<Evento>(linea)
+                println("[Cliente] Evento recibido: $evento")
+            }
+        }
+    }
+}
+
 fun main(args: Array<String>) {
-    val opts = args.toOptions()
-    val host = opts["host"] ?: "127.0.0.1"
-    val puerto = (opts["port"] ?: "5050").toIntOrNull() ?: 5050
-    val cmdName = (opts["cmd"] ?: "create").lowercase()
-    val json = JsonConfig.default
-
-    val comando: Comando = when (cmdName) {
-        "create" -> {
-            val nombre = opts["name"] ?: "Cliente"
-            val playerId = (opts["playerId"] ?: "1001").toLongOrNull() ?: 1001L
-            Comando.CrearPartida(Jugador(id = playerId, nombre = nombre))
-        }
-        "join" -> {
-            val id = opts["id"] ?: return usage("Falta --id para join")
-            val nombre = opts["name"] ?: "Cliente"
-            val playerId = (opts["playerId"] ?: "1002").toLongOrNull() ?: 1002L
-            Comando.UnirseAPartida(idPartida = id, jugador = Jugador(id = playerId, nombre = nombre))
-        }
-        "joinauto", "joinauto" -> {
-            val nombre = opts["name"] ?: "Cliente"
-            val playerId = (opts["playerId"] ?: "1002").toLongOrNull() ?: 1002L
-            Comando.UnirseAPartidaAuto(jugador = Jugador(id = playerId, nombre = nombre))
-        }
-        "move" -> {
-            val id = opts["id"] ?: return usage("Falta --id para move")
-            val playerId = (opts["playerId"] ?: return usage("Falta --playerId para move")).toLongOrNull()
-                ?: return usage("--playerId inválido")
-            val fila = (opts["fila"] ?: return usage("Falta --fila para move")).toIntOrNull()
-                ?: return usage("--fila inválido")
-            val columna = (opts["columna"] ?: return usage("Falta --columna para move")).toIntOrNull()
-                ?: return usage("--columna inválido")
-            val contenido = opts["contenido"] ?: return usage("Falta --contenido para move")
-            Comando.RealizarMovimiento(idPartida = id, jugadorId = playerId, fila = fila, columna = columna, contenido = contenido)
-        }
-        else -> return usage("--cmd debe ser create|join|joinAuto|move")
-    }
-
-    Socket(host, puerto).use { socket ->
-        val inReader = BufferedReader(InputStreamReader(socket.getInputStream()))
-        val outWriter = PrintWriter(socket.getOutputStream(), true)
-
-        outWriter.println(json.encodeToString<Comando>(comando))
-
-        val linea = inReader.readLine()
-        if (linea != null) {
-            val evento = json.decodeFromString<Evento>(linea)
-            println("[Cliente] Evento recibido: $evento")
-        }
-    }
+    val cliente = ClienteMain()
+    cliente.ejecutar(args)
 }
 
 private fun Array<String>.toOptions(): Map<String, String> {

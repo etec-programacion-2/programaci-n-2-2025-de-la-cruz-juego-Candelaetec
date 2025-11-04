@@ -3,7 +3,10 @@ package org.example
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-fun main() {
+
+class App {
+
+    fun ejecutar() {
     println("=== JUEGO COMPLETO CON TABLERO ===\n")
     
     // 1. Crear jugadores
@@ -126,6 +129,12 @@ fun main() {
     println(juegoAjedrez.verTablero())
     
     println("Estado del juego de ajedrez: $juegoAjedrez")
+    }
+}
+
+fun main() {
+    val app = App()
+    app.ejecutar()
 }
 
 /**

@@ -9,7 +9,8 @@ import kotlinx.serialization.decodeFromString
 
 /**
  * Cliente de consola mejorado con interfaz de usuario amigable.
- * 
+ * Hereda de ClienteBase para compartir funcionalidad común.
+ *
  * Características:
  * - Menús interactivos numerados
  * - Validación de entrada del usuario
@@ -21,13 +22,13 @@ import kotlinx.serialization.decodeFromString
 class ClienteConsola(
     private val host: String = "127.0.0.1",
     private val puerto: Int = 5050
-) {
+) : ClienteBase() {
     private val json = JsonConfig.default
     private var socket: Socket? = null
     private var inReader: BufferedReader? = null
     private var outWriter: PrintWriter? = null
-    private var jugadorActual: Jugador? = null
-    private var juegoActual: Juego? = null
+    internal override var jugadorActual: Jugador? = null
+    internal override var juegoActual: Juego? = null
     private var partidaId: String? = null
     private var ejecutando = false
     private var pool: java.util.concurrent.ExecutorService? = null
@@ -835,9 +836,10 @@ class ClienteConsola(
     }
 
     /**
-     * Muestra un error de forma consistente
+     * Implementa el método abstracto de ClienteBase
+     * Polimorfismo: cada tipo de cliente muestra errores de manera diferente
      */
-    private fun mostrarError(mensaje: String) {
+    override fun mostrarError(mensaje: String) {
         println("\n❌ ERROR: $mensaje")
         println("─" * 50)
     }
@@ -848,19 +850,3 @@ class ClienteConsola(
  */
 private operator fun String.times(n: Int): String = this.repeat(n)
 
-/**
- * Función principal para ejecutar el cliente mejorado
- */
-fun main(args: Array<String>) {
-    val host = args.find { it.startsWith("--host=") }?.substringAfter("=") ?: "127.0.0.1"
-    val puerto = args.find { it.startsWith("--port=") }?.substringAfter("=")?.toIntOrNull() ?: 5050
-    
-    val cliente = ClienteConsola(host, puerto)
-    
-    try {
-        cliente.ejecutar()
-    } catch (e: Exception) {
-        println("❌ Error fatal: ${e.message}")
-        e.printStackTrace()
-    }
-}
