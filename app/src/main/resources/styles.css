@@ -1,0 +1,228 @@
+/* Estilos CSS para la aplicación JavaFX del juego de tablero */
+
+/* Tema general */
+.root {
+    -fx-background-color: #f5f5f5;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Menú principal */
+.menu-root {
+    -fx-background-color: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-color: #ddd;
+    -fx-border-width: 2;
+}
+
+.titulo {
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 2, 0, 0, 1);
+}
+
+.label-input {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.input-field {
+    -fx-background-color: rgba(255, 255, 255, 0.9);
+    -fx-border-color: #ddd;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8;
+}
+
+.input-field:focused {
+    -fx-border-color: #667eea;
+    -fx-border-width: 2;
+}
+
+/* Botones */
+.boton-principal {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1);
+    -fx-cursor: hand;
+}
+
+.boton-principal:hover {
+    -fx-background-color: #45a049;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 3, 0, 0, 2);
+}
+
+.boton-secundario {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1);
+    -fx-cursor: hand;
+}
+
+.boton-secundario:hover {
+    -fx-background-color: #1976D2;
+}
+
+.boton-salir {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1);
+    -fx-cursor: hand;
+}
+
+.boton-salir:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* Escena del juego */
+.juego-root {
+    -fx-background-color: #f5f5f5;
+}
+
+.info-panel {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 0 0 1 0;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+}
+
+.turno-label {
+    -fx-text-fill: #333;
+    -fx-font-size: 16px;
+}
+
+.estado-label {
+    -fx-text-fill: #666;
+    -fx-font-size: 14px;
+}
+
+/* Tablero */
+.tablero {
+    -fx-background-color: #8B4513;
+    -fx-padding: 20;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 3);
+}
+
+.celda-tablero {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-border-width: 1;
+    -fx-border-color: #654321;
+    -fx-cursor: hand;
+}
+
+.celda-clara {
+    -fx-background-color: #F5DEB3;
+}
+
+.celda-clara:hover {
+    -fx-background-color: #FFE4B5;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+.celda-oscura {
+    -fx-background-color: #DEB887;
+}
+
+.celda-oscura:hover {
+    -fx-background-color: #D2B48C;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0, 0, 1);
+}
+
+.celda-seleccionada {
+    -fx-background-color: #FFD700;
+    -fx-border-color: #FFA500;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(255,165,0,0.5), 0, 0, 0, 5);
+}
+
+/* Panel de control */
+.control-panel {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 0 0 0 1;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+}
+
+.label-mensajes {
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.mensajes-area {
+    -fx-control-inner-background: #f9f9f9;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-font-family: "Consolas", monospace;
+    -fx-font-size: 12px;
+}
+
+/* Scroll bars */
+.scroll-bar:vertical {
+    -fx-background-color: #f5f5f5;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #ccc;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #999;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+/* Alert dialogs */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #667eea;
+    -fx-background-radius: 5 5 0 0;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane .button {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-cursor: hand;
+}
+
+/* Text input dialog */
+.text-input-dialog .text-field {
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+}
